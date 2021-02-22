@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<launch>
+  <arg name="sim" default="true"/>
+  <arg name="usb_port" default="/dev/ttyUSB0" />
+
+  <!-- startup ros_control for real robot -->
+  <group unless="$(arg sim)">
+    <include file="$(find open_manipulator_hw)/launch/open_manipulator_control.launch">
+      <arg name="usb_port" value="$(arg usb_port)"/>
+    </include>
+  </group>
+
+  <!-- startup simulated world and spawn robot-->
+  <group if="$(arg sim)">
+    <include file="$(find simulation)/launch/om_gazebo.launch"/>
+  
+  
+  </group>
+
+
+
+<group ns="robot1"> <!-- unique name to create different topics-->
+  <param name="tf_prefix" value="robot1_tf" /> <!-- unique tf_prefix -->
+   <include file="$(find simulation)/launch/om_robot_launcher.launch">
+    <arg name="init_pose" value=" -x 0.0 -y 0.0 -Y 0.0 -J joint1 0.0 -J joint2 -1.0 -J joint3 0.3 -J joint4 0.7 -J gripper 0.0 -J gripper_sub 0.0"/>
+    <arg name="robot_name" value="robot1"/>
+
+   </include>
+</group>
+
+<group ns="robot2"> <!-- unique name to create different topics-->
+  <param name="tf_prefix" value="robot2_tf" /> <!-- unique tf_prefix -->
+   <include file="$(find simulation)/launch/om_robot_launcher.launch">
+    <arg name="init_pose" value="-x 0.0 -y 0.3 -Y 0.0 -J joint1 0.0 -J joint2 -1.0 -J joint3 0.3 -J joint4 0.7 -J gripper 0.0 -J gripper_sub 0.0"/>
+    <arg name="robot_name" value="robot2"/>
+   </include>
+</group>
+
+  <!-- joint_trajectory_controller 
+  <group unless="$(arg sim)">
+    <rosparam file="$(find open_manipulator_controllers)/config/joint_trajectory_controller.yaml" command="load"/>
+  </group> -->
+
+
+
+
+  <!-- startup move_group related 
+  <include file="$(find open_manipulator_moveit_config)/launch/move_group.launch"/>
+  <include file="$(find open_manipulator_moveit_config)/launch/moveit_rviz.launch"/>-->
+
+<include file="$(find moveit_files)/launch/dual_arm_moveit.launch" /> 
+</launch>

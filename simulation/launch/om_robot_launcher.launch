@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+
+<arg name ="limited" default ="false" doc="If true, limits joint range [-PI,PI] on all joints."/>
+
+<arg name="robot_name"/>
+<arg name="init_pose"/>
+
+
+  <!-- Send robot urdf to param server -->
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find open_manipulator_description)/urdf/open_manipulator_robot.urdf.xacro'" />
+  <!-- Spawn robot in gazebo (and move it upwards):
+       better initial values should be -2.355 and 1.57 but the robot does
+       something strange when unpausing it
+  -->
+  <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model"
+        args="$(arg init_pose) -urdf -param robot_description -model $(arg robot_name)"  output="screen" />
+
+  <!-- controller utils -->
+  <include file="$(find simulation)/launch/smart_arm_controller_utils.launch"/>
+
+
+</launch>
